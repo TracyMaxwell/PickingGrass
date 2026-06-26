@@ -50,6 +50,31 @@
   }
 }
 
+/* PickingGrass theme — colors extracted from Logo.svg */
+:root {
+  --pg-accent:         #39b54a;
+  --pg-accent-dark:    #005a37;
+  --pg-accent-bg:      #e6f7ea;
+  --pg-accent-bg-mute: #b8e8c2;
+  --pg-accent-text:    #ffffff;
+
+  --pg-surface:        #ffffff;
+  --pg-surface-soft:   #f8f8f8;
+  --pg-text:           #231f20;
+  --pg-text-muted:     rgba(35, 31, 32, 0.55);
+}
+
+@media (prefers-color-scheme: dark) {
+  :root {
+    --pg-accent-bg:      #0e2e1a;
+    --pg-accent-bg-mute: #1a4228;
+    --pg-surface:        #1a1a1a;
+    --pg-surface-soft:   #222222;
+    --pg-text:           #f0f0f0;
+    --pg-text-muted:     rgba(240, 240, 240, 0.55);
+  }
+}
+
 *,
 *::before,
 *::after {

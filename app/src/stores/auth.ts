@@ -7,9 +7,12 @@ export const useAuthStore = defineStore('auth', () => {
   const user = ref<User | null>(null)
   const loading = ref(true)
 
-  onAuthStateChanged(auth, (firebaseUser) => {
-    user.value = firebaseUser
-    loading.value = false
+  const ready = new Promise<void>((resolve) => {
+    onAuthStateChanged(auth, (firebaseUser) => {
+      user.value = firebaseUser
+      loading.value = false
+      resolve()
+    })
   })
 
   async function signInWithGoogle() {
@@ -20,5 +23,5 @@ export const useAuthStore = defineStore('auth', () => {
     await signOut(auth)
   }
 
-  return { user, loading, signInWithGoogle, signOutUser }
+  return { user, loading, ready, signInWithGoogle, signOutUser }
 })

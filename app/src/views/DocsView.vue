@@ -2,12 +2,13 @@
 </script>
 
 <template>
-  <div class="app-view">
+  <div class="docs-view">
   </div>
 </template>
 
 <style scoped>
-.app-view {
-  min-height: 100vh;
+.docs-view {
+  flex: 1;
+  background-color: var(--pg-accent);
 }
 </style>
