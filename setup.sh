@@ -51,8 +51,19 @@ npm --version
 
 echo ""
 echo "==> Cloning $REPO into $CLONE_DIR..."
+ENV_BACKUP=""
+if [[ -f "$APP_DIR/.env.local" ]]; then
+  ENV_BACKUP=$(mktemp)
+  cp "$APP_DIR/.env.local" "$ENV_BACKUP"
+  echo "==> Backed up existing .env.local"
+fi
 rm -rf "$CLONE_DIR"
 git clone "$REPO" "$CLONE_DIR"
+if [[ -n "$ENV_BACKUP" ]]; then
+  cp "$ENV_BACKUP" "$APP_DIR/.env.local"
+  rm -f "$ENV_BACKUP"
+  echo "==> Restored .env.local"
+fi
 
 # ── Firebase env vars ────────────────────────────────────────────────────────
 
@@ -93,8 +104,8 @@ fi
 # ── Detect domain / IP ───────────────────────────────────────────────────────
 
 if [[ -z "${DOMAIN:-}" ]]; then
-  DETECTED_IP=$(curl -sf --connect-timeout 3 http://169.254.169.254/latest/meta-data/public-ipv4 || true)
-  if [[ -n "$DETECTED_IP" ]]; then
+  DETECTED_IP=$(curl -sf --connect-timeout 3 http://169.254.169.254/latest/meta-data/public-ipv4 || echo "")
+  if [[ -n "${DETECTED_IP:-}" ]]; then
     read -r -p "==> Detected public IP: $DETECTED_IP. Use this as the domain? [Y/n] " use_ip || use_ip="y"
     if [[ "${use_ip:-y}" != "n" ]]; then
       DOMAIN="$DETECTED_IP"
