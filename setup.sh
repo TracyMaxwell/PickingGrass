@@ -104,16 +104,6 @@ fi
 # ── Detect domain / IP ───────────────────────────────────────────────────────
 
 if [[ -z "${DOMAIN:-}" ]]; then
-  DETECTED_IP=$(curl -sf --connect-timeout 3 http://169.254.169.254/latest/meta-data/public-ipv4 || echo "")
-  if [[ -n "${DETECTED_IP:-}" ]]; then
-    read -r -p "==> Detected public IP: $DETECTED_IP. Use this as the domain? [Y/n] " use_ip || use_ip="y"
-    if [[ "${use_ip:-y}" != "n" ]]; then
-      DOMAIN="$DETECTED_IP"
-    fi
-  fi
-fi
-
-if [[ -z "${DOMAIN:-}" ]]; then
   read -r -p "==> Enter your domain or IP: " DOMAIN || true
 fi
 
