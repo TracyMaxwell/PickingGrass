@@ -95,15 +95,15 @@ fi
 if [[ -z "${DOMAIN:-}" ]]; then
   DETECTED_IP=$(curl -sf --connect-timeout 3 http://169.254.169.254/latest/meta-data/public-ipv4 || true)
   if [[ -n "$DETECTED_IP" ]]; then
-    read -r -p "==> Detected public IP: $DETECTED_IP. Use this as the domain? [Y/n] " use_ip
-    if [[ "${use_ip,,}" != "n" ]]; then
+    read -r -p "==> Detected public IP: $DETECTED_IP. Use this as the domain? [Y/n] " use_ip || use_ip="y"
+    if [[ "${use_ip:-y}" != "n" ]]; then
       DOMAIN="$DETECTED_IP"
     fi
   fi
 fi
 
 if [[ -z "${DOMAIN:-}" ]]; then
-  read -r -p "==> Enter your domain or IP: " DOMAIN
+  read -r -p "==> Enter your domain or IP: " DOMAIN || true
 fi
 
 echo "==> Using domain: $DOMAIN"
@@ -172,8 +172,8 @@ if [[ "$DOMAIN" =~ ^[0-9]+\.[0-9]+\.[0-9]+\.[0-9]+$ ]]; then
   echo "        sudo certbot --nginx -d yourdomain.com"
 else
   echo ""
-  read -r -p "==> Set up SSL with Let's Encrypt for $DOMAIN? [y/N] " ssl_answer
-  if [[ "${ssl_answer,,}" == "y" ]]; then
+  read -r -p "==> Set up SSL with Let's Encrypt for $DOMAIN? [y/N] " ssl_answer || ssl_answer="n"
+  if [[ "${ssl_answer:-n}" == "y" ]]; then
     certbot --nginx -d "$DOMAIN" --non-interactive --agree-tos -m "admin@$DOMAIN"
     systemctl reload nginx
     echo "==> SSL configured."
