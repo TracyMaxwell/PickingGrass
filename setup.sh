@@ -1,12 +1,9 @@
 #!/usr/bin/env bash
-# setup.sh — Provision a fresh Ubuntu 24.04 EC2 instance to serve PickingGrass
+# setup.sh — Provision a fresh Amazon Linux 2023 instance to serve PickingGrass
 #
-# Run this directly on the server via the AWS Console:
-#   curl -fsSL <raw-url-to-this-script> | sudo -E bash
-#
-# Or after cloning the repo:
-#   export REPO=https://github.com/your-org/PickingGrass
-#   sudo -E bash setup.sh
+# Run this from the AWS Console terminal:
+#   export REPO=https://<token>@github.com/TracyMaxwell/PickingGrass
+#   curl -fsSL https://<token>@raw.githubusercontent.com/TracyMaxwell/PickingGrass/main/setup.sh | sudo -E bash
 
 set -euo pipefail
 
@@ -16,7 +13,7 @@ REPO="${REPO:-}"
 CLONE_DIR="/opt/picking-grass"
 APP_DIR="$CLONE_DIR/app"
 SERVE_DIR="/var/www/picking-grass"
-NGINX_CONF="/etc/nginx/sites-available/picking-grass"
+NGINX_CONF="/etc/nginx/conf.d/picking-grass.conf"
 
 # ── Helpers ─────────────────────────────────────────────────────────────────
 
@@ -31,22 +28,21 @@ prompt_var() {
 # ── Get repo URL ─────────────────────────────────────────────────────────────
 
 if [[ -z "$REPO" ]]; then
-  read -r -p "Enter git repo URL (e.g. https://github.com/your-org/PickingGrass): " REPO
+  read -r -p "Enter git repo URL (e.g. https://<token>@github.com/TracyMaxwell/PickingGrass): " REPO
 fi
 
 # ── System packages ──────────────────────────────────────────────────────────
 
 echo ""
 echo "==> Updating system packages..."
-apt-get update -y
-apt-get upgrade -y
+dnf update -y
 
 echo "==> Installing git, nginx, certbot..."
-apt-get install -y git nginx certbot python3-certbot-nginx
+dnf install -y git nginx certbot python3-certbot-nginx
 
 echo "==> Installing Node.js 22 (LTS)..."
-curl -fsSL https://deb.nodesource.com/setup_22.x | bash -
-apt-get install -y nodejs
+curl -fsSL https://rpm.nodesource.com/setup_22.x | bash -
+dnf install -y nodejs
 
 node --version
 npm --version
@@ -97,7 +93,6 @@ fi
 # ── Detect domain / IP ───────────────────────────────────────────────────────
 
 if [[ -z "${DOMAIN:-}" ]]; then
-  # Auto-detect EC2 public IP from instance metadata
   DETECTED_IP=$(curl -sf --connect-timeout 3 http://169.254.169.254/latest/meta-data/public-ipv4 || true)
   if [[ -n "$DETECTED_IP" ]]; then
     read -r -p "==> Detected public IP: $DETECTED_IP. Use this as the domain? [Y/n] " use_ip
@@ -126,7 +121,7 @@ npm run build
 echo "==> Deploying built files to $SERVE_DIR..."
 mkdir -p "$SERVE_DIR"
 cp -r "$APP_DIR/dist/." "$SERVE_DIR/"
-chown -R www-data:www-data "$SERVE_DIR"
+chown -R nginx:nginx "$SERVE_DIR"
 chmod -R 755 "$SERVE_DIR"
 
 # ── nginx configuration ──────────────────────────────────────────────────────
@@ -160,9 +155,6 @@ server {
     }
 }
 NGINX
-
-ln -sf "$NGINX_CONF" /etc/nginx/sites-enabled/picking-grass
-rm -f /etc/nginx/sites-enabled/default
 
 echo "==> Testing nginx config..."
 nginx -t
@@ -198,5 +190,5 @@ echo " Deployment complete!"
 echo " Site is live at: http://$DOMAIN"
 echo "========================================="
 echo ""
-echo "REMINDER: Add $DOMAIN to Firebase Console →"
-echo "  Authentication → Settings → Authorized domains"
+echo "REMINDER: Add $DOMAIN to Firebase Console ->"
+echo "  Authentication -> Settings -> Authorized domains"
