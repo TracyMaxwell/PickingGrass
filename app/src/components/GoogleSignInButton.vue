@@ -1,11 +1,14 @@
 <script setup lang="ts">
 import { useAuthStore } from '@/stores/auth'
+import { useRouter } from 'vue-router'
 
 const auth = useAuthStore()
+const router = useRouter()
 
 async function handleSignIn() {
   try {
     await auth.signInWithGoogle()
+    router.push({ name: 'editor' })
   } catch (err) {
     console.error('Sign-in failed', err)
   }
@@ -19,7 +22,6 @@ async function handleSignIn() {
       <path fill="#4285F4" d="M46.52 24.5c0-1.64-.15-3.22-.42-4.74H24v8.98h12.7c-.55 2.9-2.22 5.36-4.72 7.02l7.26 5.64C43.44 37.3 46.52 31.36 46.52 24.5z"/>
       <path fill="#FBBC05" d="M10.84 28.32A14.6 14.6 0 0 1 9.5 24c0-1.5.26-2.95.72-4.32l-7.08-5.5A23.94 23.94 0 0 0 0 24c0 3.87.92 7.53 2.54 10.76l8.3-6.44z"/>
       <path fill="#34A853" d="M24 47c5.5 0 10.12-1.82 13.5-4.96l-7.26-5.64c-1.82 1.22-4.15 1.94-6.24 1.94-6.16 0-11.4-3.88-13.16-9.32l-8.3 6.44C7.07 41.52 14.82 47 24 47z"/>
-      <path fill="none" d="M0 0h48v48H0z"/>
     </svg>
     Sign in with Google
   </button>
@@ -29,6 +31,7 @@ async function handleSignIn() {
 .google-btn {
   display: flex;
   align-items: center;
+  justify-content: center;
   gap: 0.75rem;
   padding: 0.65rem 1.5rem;
   border: 1px solid var(--color-border);
@@ -40,7 +43,6 @@ async function handleSignIn() {
   cursor: pointer;
   transition: box-shadow 0.15s;
   width: 100%;
-  justify-content: center;
 }
 
 .google-btn:hover {

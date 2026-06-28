@@ -16,7 +16,8 @@ export const useAuthStore = defineStore('auth', () => {
   })
 
   async function signInWithGoogle() {
-    await signInWithPopup(auth, googleProvider)
+    const result = await signInWithPopup(auth, googleProvider)
+    user.value = result.user
   }
 
   async function signOutUser() {
